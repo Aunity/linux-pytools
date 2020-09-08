@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+'''
+@Author ymh
+@Email  maohuay@hotmail.com
+@Date   2020-05-07 21:45:34
+@Web    https://github.com/Aunity
+'''
+import os
+import sys
+import time
+import argparse
+
+from tkinter import *
+
+def messagebox(PID):
+    root = Tk()
+    root.title("Notification!")
+    label = Label(root, text='Your job of %d finished!'%PID)
+    label.pack(side="top", fill="both", expand=True, padx=20, pady=20)
+    button = Button(root, text="OK", command=lambda: root.destroy())
+    button.pack(side="bottom", fill="none", expand=True)
+    root.lift()
+    root.attributes('-topmost',True)
+    root.after_idle(root.attributes,'-topmost',False)
+
+    sw = root.winfo_screenwidth()
+    sh = root.winfo_screenheight()
+    ww = 300;wh = 100
+    x = (sw-ww) / 2
+    y = (sh-wh) / 2
+    root.geometry("%dx%d+%d+%d" %(ww,wh,x,y))
+    root.mainloop()
+
+def main():
+    parser = argparse.ArgumentParser(description="Monitor your PID job.")
+    parser.add_argument("PID", type=int, help="The job's PID to be monitored.")
+    parser.add_argument("interval", type=int, default=30, help="The interval time (s) to check.")
+
+    args = parser.parse_args()
+    PID, interval = args.PID, args.interval
+    PIDdir = os.path.join("/proc", str(PID))
+    if os.path.exists(PIDdir) == 0:
+        print("The job of %d are not running."%PID)
+        sys.exit(0)
+    cmdline = open(os.path.join(PIDdir,"cmdline")).readlines()
+    if len(cmdline)==0:
+        print("Not founf the cmdline for %d"%PID)
+        sys.exit(0)
+    while os.path.exists(PIDdir):
+        time.sleep(interval)
+    messagebox(PID)
+if __name__ == '__main__':
+    main()
