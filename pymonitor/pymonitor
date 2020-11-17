@@ -34,7 +34,7 @@ def messagebox(PID):
 def main():
     parser = argparse.ArgumentParser(description="Monitor your PID job.")
     parser.add_argument("PID", type=int, help="The job's PID to be monitored.")
-    parser.add_argument("interval", type=int, default=30, help="The interval time (s) to check.")
+    parser.add_argument("-i", dest="interval", type=int, default=30, help="The interval time (s) to check.")
 
     args = parser.parse_args()
     PID, interval = args.PID, args.interval
@@ -49,5 +49,6 @@ def main():
     while os.path.exists(PIDdir):
         time.sleep(interval)
     messagebox(PID)
+
 if __name__ == '__main__':
     main()
